@@ -82,18 +82,18 @@ export default function Navbar() {
           >
             Julie Dietrich Art
           </Typography>
-          {navLinksFunction(!!userId).map((navLink, index) => {
+          {navLinksFunction(!!userId).map(({route, title}, index) => {
             return (
               <Link
+                shallow={route !== '/available-works'}
                 key={index}
-                href={navLink.route}
-                passHref
+                href={route}
                 onClick={() => {
-                  navLink.title === "Log out" ? handleLogout() : undefined;
+                  title === "Log out" ? handleLogout() : undefined;
                 }}
               >
                 <Button sx={{ mx: 2 }} variant="text" className="navbar-btn">
-                  {navLink.title}
+                  {title}
                 </Button>
               </Link>
             );

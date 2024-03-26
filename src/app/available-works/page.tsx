@@ -84,7 +84,7 @@ export default async function Page() {
                       </Box>
 
                       <Typography variant="h4">{item.title}</Typography>
-                      <Link href={`/available-works/${item.ID}`}>
+                      <Link prefetch={true} href={`/available-works/${item.ID}`}>
                         <Button fullWidth variant="contained" color="primary">
                           Details
                         </Button>

@@ -25,7 +25,13 @@ const Checkout = () => {
 
   const router = useRouter();
 
+  router.prefetch('/login')
+  router.prefetch('/delivery-details')
+
   const handleRedirect = () => {
+
+    console.log('teste ', userId)
+
     if (!userId) {
       router.push("/login");
     } else {

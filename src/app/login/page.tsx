@@ -37,6 +37,8 @@ const Login = () => {
 
   const router = useRouter();
 
+  router.prefetch('/delivery-details')
+
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -45,13 +47,12 @@ const Login = () => {
         email,
         password,
       });
-      console.log(response)
       setUserId(response.data.userId);
 
       localStorage.setItem("token", `Bearer ${response.data.token}`);
 
       if (cart.length === 0) {
-        router.push("/");
+        router.push("/", );
       }
 
       if (cart.length > 0) {
@@ -107,7 +108,7 @@ const Login = () => {
           </button>
 
           <p style={{ marginBottom: "10px" }}>New to Julie Dtrick?</p>
-          <Link href="/create-account">Create an account</Link>
+          <Link shallow href="/create-account">Create an account</Link>
         </form>
       )}
     </Container>

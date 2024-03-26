@@ -7,16 +7,20 @@ import {
   useElements,
   useStripe,
 } from "@stripe/react-stripe-js";
-import { Alert, Button, Snackbar, Stack, Box } from "@mui/material";
+import { Alert, Snackbar, Stack, Box } from "@mui/material";
 import { StripeElementType } from "@stripe/stripe-js";
 
-const CheckoutForm: React.FC<{ clientSecret: string }> = ({ clientSecret }) => {
+type CheckoutFormProps = {
+  clientSecret: string;
+  onDisabled: (disabled: boolean ) => void;
+  onLoad: (load: boolean ) => void;
+}
+const CheckoutForm: React.FC<CheckoutFormProps> = ({ clientSecret, onDisabled, onLoad }) => {
   const stripe = useStripe();
   const elements = useElements();
 
   const [open, setOpen] = React.useState(false);
   const [error, setError] = useState("");
-  const [disabled, setDisabled] = useState(true);
 
   const handleClose = () => {
     setOpen(false);
@@ -26,6 +30,8 @@ const CheckoutForm: React.FC<{ clientSecret: string }> = ({ clientSecret }) => {
     event.preventDefault();
 
     elements?.submit();
+
+    onLoad(true)
 
     const response = await stripe?.confirmPayment({
       elements: elements ?? undefined,
@@ -39,6 +45,8 @@ const CheckoutForm: React.FC<{ clientSecret: string }> = ({ clientSecret }) => {
       setOpen(true);
       setError(response.error?.message ?? "");
     }
+
+    onLoad(false)
   };
 
   const handleChange = async ({
@@ -51,12 +59,12 @@ const CheckoutForm: React.FC<{ clientSecret: string }> = ({ clientSecret }) => {
 
       const elementValue = await stripeElement?.getValue();
 
-      setDisabled(!elementValue);
+      onDisabled(!elementValue);
     }
   };
 
   return (
-    <Stack rowGap={2}>
+    <Stack gap={2}>
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={open}
@@ -73,8 +81,8 @@ const CheckoutForm: React.FC<{ clientSecret: string }> = ({ clientSecret }) => {
         </Alert>
       </Snackbar>
       <form
+        id="checkout-form"
         onSubmit={(event) => handleSubmit(event)}
-        style={{ width: "80dvw" }}
       >
         <Stack
           gap={6}
@@ -82,15 +90,10 @@ const CheckoutForm: React.FC<{ clientSecret: string }> = ({ clientSecret }) => {
           sx={{ width: "70dvw" }}
           justifyContent="space-between"
         >
-          <Box flex={2}>
+          <Stack flex={2} gap={3}>
             <h3>Contact info</h3>
-            <LinkAuthenticationElement
-              options={{
-                defaultValues: {
-                  email: "test@gmail.com",
-                },
-              }}
-            />
+            <LinkAuthenticationElement />
+
             <h3>Address</h3>
             <AddressElement
               onChange={handleChange}
@@ -99,40 +102,18 @@ const CheckoutForm: React.FC<{ clientSecret: string }> = ({ clientSecret }) => {
                 fields: {
                   phone: "always",
                 },
-                validation: {
-                  phone: {
-                    required: "always",
-                  },
-                },
               }}
             />
-          </Box>
+
+          </Stack>
           <Box flex={1}>
-            <h3>Payment</h3>
-            <PaymentElement
-              options={{
-                defaultValues: {
-                  billingDetails: {
-                    name: "John Doe",
-                    phone: "888-888-8888",
-                    address: {
-                      postal_code: "10001",
-                      country: "US",
-                    },
-                  },
-                },
-              }}
-            />
+            <h3 style={{
+              marginBottom: 24
+            }}>Payment</h3>
+
+            <PaymentElement />
           </Box>
         </Stack>
-        <Button
-          variant="contained"
-          type="submit"
-          disabled={disabled}
-          sx={{ marginX: "auto" }}
-        >
-          Confirm payment
-        </Button>
       </form>
     </Stack>
   );
